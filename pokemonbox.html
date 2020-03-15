@@ -27,7 +27,13 @@
     <script src="http://netdna.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
     
     <script>
-        function loadTracker(positionTracker = 'defaultTracker') {
+        function getTrackerName() {
+            const trackerNameInput = document.querySelector('#trackerName').value || 'default';
+
+            return trackerNameInput + 'Tracker';
+        }
+
+        function loadTracker(positionTracker) {
             let tracker = JSON.parse(localStorage.getItem(positionTracker));
 
             if (tracker === null) {
@@ -37,7 +43,7 @@
             return tracker;
         }
 
-        function savePosition(position, positionTracker = 'defaultTracker') {
+        function savePosition(position, positionTracker) {
             const tracker = loadTracker(positionTracker);
 
             tracker[position] = true;
@@ -45,13 +51,13 @@
             localStorage.setItem(positionTracker, JSON.stringify(tracker));
         }
 
-        function checkPosition(position, positionTracker = 'defaultTracker') {
+        function checkPosition(position, positionTracker) {
             const tracker = loadTracker(positionTracker);
             
             return tracker.hasOwnProperty(position);
         }
 
-        function duplicateCheck(position, positionTracker = 'defaultTracker') {
+        function duplicateCheck(position, positionTracker) {
             const duplicateWarning = document.querySelector('#duplicateWarning');
 
             if (checkPosition(position, positionTracker)) {    
@@ -81,7 +87,9 @@
             pokemonPosition = document.querySelector('#pokemonPosition');
 
             const typeHandler = function(e) {
-                duplicateCheck(e.target.value);
+                if (document.querySelector('#enableTracker').checked) {
+                    duplicateCheck(e.target.value, getTrackerName());
+                }
 
                 updateBoxInfo(e.target.value);                
             }
@@ -90,7 +98,9 @@
                 if (e.keyCode == 13) {
                     e.target.select();
 
-                    savePosition(e.target.value);
+                    if (document.querySelector('#enableTracker').checked) {
+                        savePosition(e.target.value, getTrackerName());
+                    }
                 }
             }
 
@@ -133,12 +143,16 @@
             <div class="col-sm-10 col-sm-offset-1">
                 <div class="alert alert-info" role="alert">
                     Enter the position of the Pokemon for whatever system you're organizing it by and this will tell you where it belongs in your boxes.
+                    <br><br>
+                    Optionally, you can track what positions have already been filled as you go. Whenever you hit enter after typing a Pokemon Position, the current Pokemon Position will be saved to the named tracker, if you've enabled tracking.
                 </div>
             </div>
         </div>
         <div class="row">
             <div class="form-group">
-                <label for="pokemonPosition" class="col-xs-4 col-xs-offset-1 control-label">Pokemon Position</label>
+                <label for="pokemonPosition" class="col-xs-4 col-xs-offset-1 control-label">
+                    Pokemon Position
+                </label>
                 <div class="col-xs-3">
                     <input type="text" class="form-control" id="pokemonPosition" placeholder="123">
                     <span id="duplicateWarning" class="duplicateWarning"></span>
@@ -147,7 +161,9 @@
         </div>
         <div class="row">
             <div class="form-group">
-                <label for="box" class="col-xs-4 col-xs-offset-1 control-label">Box</label>
+                <label for="box" class="col-xs-4 col-xs-offset-1 control-label">
+                    Box
+                </label>
                 <div class="col-xs-3">
                     <input type="text" class="form-control" id="box" disabled>
                 </div>
@@ -155,7 +171,9 @@
         </div>
         <div class="row">
             <div class="form-group">
-                <label for="boxRow" class="col-xs-4 col-xs-offset-1 control-label">Row</label>
+                <label for="boxRow" class="col-xs-4 col-xs-offset-1 control-label">
+                    Row
+                </label>
                 <div class="col-xs-3">
                     <input type="text" class="form-control" id="boxRow" disabled>
                 </div>
@@ -163,9 +181,22 @@
         </div>
         <div class="row">
             <div class="form-group">
-                <label for="boxColumn" class="col-xs-4 col-xs-offset-1 control-label">Column</label>
+                <label for="boxColumn" class="col-xs-4 col-xs-offset-1 control-label">
+                    Column
+                </label>
                 <div class="col-xs-3">
                     <input type="text" class="form-control" id="boxColumn" disabled>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="form-group">
+                <label for="enableTracker" class="col-xs-4 col-xs-offset-1 control-label">
+                    <input type="checkbox" class="form-check" id="enableTracker">
+                    Enable Tracker
+                </label>
+                <div class="col-xs-3">
+                    <input type="text" class="form-control" id="trackerName" placeholder="Name your tracker...">
                 </div>
             </div>
         </div>
